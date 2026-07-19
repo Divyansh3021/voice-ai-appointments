@@ -69,41 +69,6 @@ telephony involved yet:
 python -m clinic_agent.entrypoint dev
 ```
 
-## Going live on a real number
-
-1. **Cliniko**: set up the 30-day trial account with your real branches
-   (Businesses), doctors (Practitioners), and services (Appointment Types).
-   Grab an API key from Cliniko's settings.
-2. **Validate the day-one unknowns** (see plan's Open Questions) against
-   your real trial account before trusting the agent with live callers:
-   ```bash
-   python scripts/seed_refdata.py
-   ```
-   Check the printed practitioner/appointment-type lists look right - this
-   also exercises the practitioner↔appointment-type association fetch,
-   which is the one part of the Cliniko integration inferred rather than
-   doc-confirmed.
-3. **LiveKit + Twilio**:
-   ```bash
-   ./scripts/setup_livekit_sip.sh +1XXXXXXXXXX
-   ```
-   Then create a Twilio Elastic SIP Trunk, set its Origination URL to your
-   LiveKit Cloud SIP URI, and attach your number to it. Get the SIP URI from
-   the LiveKit Cloud dashboard's **Telephony** page (top of the page) - it's
-   an independently-assigned hostname (e.g. `sip:11ifxjskywa.sip.livekit.cloud`),
-   **not** derived from your project's `LIVEKIT_URL` subdomain.
-4. **Deploy**:
-   ```bash
-   docker compose up -d --build
-   ```
-   (adjust for your actual hosting - `docker-compose.yml` is the reference
-   for what needs to run: one-shot `migrate`, `agent-worker`, `api`, all
-   pointed at your Neon `DATABASE_URL`.)
-5. **Test call**: call the number, book an appointment, and confirm it
-   shows up correctly in the Cliniko dashboard. Then test a reschedule and
-   a cancel the same way. `GET /admin/calls` (bearer token = `ADMIN_API_TOKEN`)
-   shows the call log if anything needs debugging.
-
 ## Observability: logs, transcripts, recordings, alerts
 
 **Logs**: every tool call and Cliniko operation logs at INFO through the
