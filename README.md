@@ -115,20 +115,3 @@ log line anywhere in the app becomes an alert automatically (deduped per
 identical message within a 5-minute window, capped at 30/hour so a crash
 loop can't spam you) - nothing else to wire up per failure site.
 
-## Known unverified assumptions
-
-A few Cliniko API specifics couldn't be confirmed from public docs alone
-and are implemented with a graceful fallback - see inline comments at each
-site:
-
-- Patient search by phone number (`tools/identify.py`) - falls back to
-  name + date-of-birth if the phone filter doesn't behave as expected.
-- Practitioner↔appointment-type association endpoint (`refdata/sync.py`) -
-  falls back to "bookable for anything" per doctor if the endpoint 404s.
-- Reschedule via `PATCH` vs. cancel+recreate (`tools/manage.py`) - both
-  paths are implemented; whichever Cliniko actually needs, the other is
-  the safety net.
-
-Run `python scripts/seed_refdata.py` and a real test booking/reschedule/
-cancel cycle against your trial account early to confirm which paths
-actually fire.
